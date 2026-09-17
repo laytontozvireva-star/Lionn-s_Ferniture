@@ -43,27 +43,3 @@ export default function App() {
     </div>
   );
 }
-
-  return (
-    <div className="flex flex-col min-h-screen bg-[#FAF7F2] text-[#101726] font-sans">
-      <Header />
-      <main className="flex-1">
-        <Routes>
-          <Route path="/"                  element={<Home />} />
-          <Route path="/shop"              element={<Shop />} />
-          <Route path="/shop/:id"          element={<ProductDetails />} />
-          <Route path="/custom-furniture"  element={<CustomFurniture />} />
-          <Route path="/about"             element={<About />} />
-          <Route path="/contact"           element={<Contact />} />
-          <Route path="/wishlist"          element={<Wishlist />} />
-          <Route path="/cart"              element={<Cart />} />
-          <Route path="/checkout"          element={<Checkout />} />
-          <Route path="/thank-you"          element={<ThankYou />} />
-          <Route path="/account"           element={<Account />} />
-          <Route path="*"                  element={<NotFound />} />
-        </Routes>
-      </main>
-      <Footer />
-    </div>
-  );
-}

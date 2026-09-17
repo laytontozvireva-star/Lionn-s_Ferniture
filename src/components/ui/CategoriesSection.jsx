@@ -7,40 +7,35 @@ const categories = [
     name: 'Living Room',
     slug: 'living-room',
     count: '48 pieces',
-    image:
-      'https://images.pexels.com/photos/1350789/pexels-photo-1350789.jpeg?auto=compress&cs=tinysrgb&w=800',
+    image: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?q=80&w=800&auto=format&fit=crop',
     span: 'lg:col-span-2 lg:row-span-2',
   },
   {
     name: 'Bedroom',
     slug: 'bedroom',
     count: '36 pieces',
-    image:
-      'https://images.pexels.com/photos/271624/pexels-photo-271624.jpeg?auto=compress&cs=tinysrgb&w=800',
+    image: 'https://images.unsplash.com/photo-1540518614846-7eded433c457?q=80&w=800&auto=format&fit=crop',
     span: '',
   },
   {
     name: 'Dining Room',
     slug: 'dining-room',
     count: '24 pieces',
-    image:
-      'https://images.pexels.com/photos/1395967/pexels-photo-1395967.jpeg?auto=compress&cs=tinysrgb&w=800',
+    image: 'https://images.unsplash.com/photo-1617806118233-18e1c094f14c?q=80&w=800&auto=format&fit=crop',
     span: '',
   },
   {
     name: 'Home Office',
     slug: 'home-office',
     count: '20 pieces',
-    image:
-      'https://images.pexels.com/photos/667838/pexels-photo-667838.jpeg?auto=compress&cs=tinysrgb&w=800',
+    image: 'https://images.unsplash.com/photo-1524758631624-e2822e304c36?q=80&w=800&auto=format&fit=crop',
     span: '',
   },
   {
     name: 'Outdoor',
     slug: 'outdoor',
     count: '18 pieces',
-    image:
-      'https://images.pexels.com/photos/1643383/pexels-photo-1643383.jpeg?auto=compress&cs=tinysrgb&w=800',
+    image: 'https://images.unsplash.com/photo-1519643381401-22c77e60520e?q=80&w=800&auto=format&fit=crop',
     span: '',
   },
 ];

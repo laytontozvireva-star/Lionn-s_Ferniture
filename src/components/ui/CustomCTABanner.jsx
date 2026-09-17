@@ -2,30 +2,29 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Pencil, ArrowRight } from 'lucide-react';
 
-// Craftsman / workshop image from Pexels
 const craftImg =
-  'https://images.pexels.com/photos/3637765/pexels-photo-3637765.jpeg?auto=compress&cs=tinysrgb&w=900';
+  'https://images.unsplash.com/photo-1581428982868-e410dd047a90?q=80&w=1000&auto=format&fit=crop';
 
 export default function CustomCTABanner() {
   return (
     <section className="py-20 md:py-28 bg-white">
       <div className="container mx-auto px-4 md:px-10 lg:px-16">
-        <div className="relative overflow-hidden rounded-3xl bg-[#101726] flex flex-col lg:flex-row items-center">
+        <div className="relative overflow-hidden rounded-3xl bg-[#F5E6D3] flex flex-col lg:flex-row items-center border border-[#e8d5bc] shadow-sm">
           {/* Text side */}
           <div className="relative z-10 flex-1 p-10 md:p-14 lg:p-20 text-center lg:text-left">
-            <span className="inline-flex items-center gap-2 mb-5 px-3 py-1 rounded-full bg-[#f4edd6]/20 text-[#f4edd6] text-xs font-semibold tracking-widest uppercase">
+            <span className="inline-flex items-center gap-2 mb-5 px-3 py-1 rounded-full bg-[#101726]/10 text-[#8a6730] text-xs font-bold tracking-widest uppercase">
               <Pencil className="w-3 h-3" /> Custom Orders
             </span>
-            <h2 className="font-display text-3xl md:text-4xl lg:text-5xl text-[#FAF7F2] mb-5 leading-tight">
+            <h2 className="font-display text-3xl md:text-4xl lg:text-5xl text-[#101726] mb-5 leading-tight">
               Can't Find Exactly<br />What You're Looking For?
             </h2>
-            <p className="text-[#C9B49A] text-lg mb-8 max-w-md mx-auto lg:mx-0 leading-relaxed">
+            <p className="text-[#6B5B4E] text-lg mb-8 max-w-md mx-auto lg:mx-0 leading-relaxed">
               Our craftsmen will build your dream piece from scratch — you choose the wood, the finish, the dimensions, and the style.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
               <Link
                 to="/custom-furniture"
-                className="group inline-flex items-center justify-center gap-2 rounded-lg bg-[#f4edd6] text-[#101726] px-7 py-3.5 font-semibold transition-all duration-300 hover:bg-white hover:scale-105"
+                className="group inline-flex items-center justify-center gap-2 rounded-lg bg-[#101726] text-[#FAF7F2] px-7 py-3.5 font-semibold transition-all duration-300 hover:bg-[#b38947] hover:scale-105 shadow-md hover:shadow-lg"
               >
                 Start Your Custom Order
                 <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
@@ -36,8 +35,8 @@ export default function CustomCTABanner() {
               {[['500+', 'Custom Pieces Built'], ['4–6 Weeks', 'Average Delivery'], ['100%', 'Satisfaction Rate']].map(
                 ([stat, label]) => (
                   <div key={label}>
-                    <p className="font-display text-2xl text-[#f4edd6]">{stat}</p>
-                    <p className="text-[#C9B49A] text-sm">{label}</p>
+                    <p className="font-display text-2xl text-[#b38947]">{stat}</p>
+                    <p className="text-[#6B5B4E] font-medium text-sm">{label}</p>
                   </div>
                 )
               )}
@@ -49,10 +48,10 @@ export default function CustomCTABanner() {
             <img
               src={craftImg}
               alt="Craftsman working on custom furniture"
-              className="w-full h-full object-cover opacity-60 lg:opacity-80"
+              className="w-full h-full object-cover opacity-90"
             />
-            {/* Gradient overlay blending into the dark bg */}
-            <div className="absolute inset-0 bg-gradient-to-r from-[#101726] via-[#101726]/40 to-transparent lg:bg-gradient-to-l" />
+            {/* Gradient overlay blending into the light bg */}
+            <div className="absolute inset-0 bg-gradient-to-t lg:bg-gradient-to-r from-[#F5E6D3] via-[#F5E6D3]/60 to-transparent" />
           </div>
         </div>
       </div>
