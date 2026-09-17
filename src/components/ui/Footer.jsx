@@ -8,11 +8,11 @@ export default function Footer() {
 
   return (
     <footer className="bg-[#101726] text-gray-300 border-t border-white/10">
-      {/* ── Top section: 3-column grid ── */}
-      <div className="max-w-7xl mx-auto px-6 py-14 grid grid-cols-1 md:grid-cols-3 gap-10">
+      {/* ── Top section: 4-column grid ── */}
+      <div className="max-w-7xl mx-auto px-6 py-14 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
 
         {/* Column 1 – Brand */}
-        <div className="md:pr-8">
+        <div>
           <h3 className="text-white text-lg font-bold tracking-wide mb-4">
             LION'S FURNITURES
           </h3>
@@ -106,6 +106,40 @@ export default function Footer() {
               <FaTwitter size={14} />
             </a>
           </div>
+        </div>
+
+        {/* Column 4 – Newsletter */}
+        <div>
+          <h4 className="text-[#b38947] font-semibold uppercase text-sm tracking-wider mb-4">
+            Newsletter
+          </h4>
+          <p className="text-sm mb-4">
+            Subscribe for exclusive offers, new arrivals, and design inspiration.
+          </p>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              alert('Thanks for subscribing!');
+            }}
+            className="flex flex-col space-y-3"
+          >
+            <label htmlFor="footer-newsletter" className="sr-only">
+              Email address
+            </label>
+            <input
+              type="email"
+              id="footer-newsletter"
+              placeholder="Your email address"
+              required
+              className="w-full px-4 py-2 rounded bg-white/10 border border-gray-500 placeholder-gray-400 text-white text-sm focus:outline-none focus:ring-2 focus:ring-[#b38947] focus:border-transparent"
+            />
+            <button
+              type="submit"
+              className="w-full bg-[#b38947] text-white py-2 rounded font-semibold text-sm hover:bg-[#9a6e38] transition-colors duration-200"
+            >
+              Subscribe
+            </button>
+          </form>
         </div>
       </div>
 
