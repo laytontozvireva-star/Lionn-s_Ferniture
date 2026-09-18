@@ -19,18 +19,21 @@ export function CartProvider({ children }) {
   }, [cartItems]);
 
   const addToCart = (product, quantity) => {
+    const addedInfo = `Added on ${new Date().toLocaleString()}`;
     setCartItems(prevItems => {
       const existingItem = prevItems.find(item => item.id === product.id);
       if (existingItem) {
+        // keep existing added info
         return prevItems.map(item =>
           item.id === product.id
             ? { ...item, quantity: item.quantity + quantity }
             : item
         );
       }
-      return [...prevItems, { ...product, quantity }];
+      return [...prevItems, { ...product, quantity, added: addedInfo }];
     });
   };
+
 
   const updateQuantity = (id, delta) => {
     setCartItems(prevItems =>

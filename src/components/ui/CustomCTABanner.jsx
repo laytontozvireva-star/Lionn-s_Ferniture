@@ -7,7 +7,7 @@ const craftImg =
 
 export default function CustomCTABanner() {
   return (
-    <section className="py-20 md:py-28 bg-white">
+    <section className="py-10 md:py-14 bg-white">
       <div className="container mx-auto px-4 md:px-10 lg:px-16">
         <div className="relative overflow-hidden rounded-3xl bg-[#F5E6D3] flex flex-col lg:flex-row items-center border border-[#e8d5bc] shadow-sm">
           {/* Text side */}

@@ -1,9 +1,13 @@
 import { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { Menu, X, Heart, ShoppingCart, User } from 'lucide-react';
+import { useCart } from '../../context/CartContext';
+import { useWishlist } from '../../context/WishlistContext';
 
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { cartCount } = useCart();
+  const { wishlistCount } = useWishlist();
 
   const navLinks = [
     { name: 'Home', to: '/' },
@@ -24,10 +28,16 @@ export default function Header() {
     }`;
 
   return (
-    <header className="sticky top-0 z-50 bg-white border-b border-[#e5e5e5] shadow-sm transition-colors duration-300">
-      <div className="max-w-7xl mx-auto flex items-center justify-between px-4 py-2">
+    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-[#e7dfd4] shadow-[0_1px_0_rgba(16,23,38,0.04)]">
+      <div className="hidden md:block bg-[#101726] text-[#f7f1e7]">
+        <div className="max-w-7xl mx-auto px-4 py-2 flex items-center justify-between text-[11px] font-medium tracking-[0.12em] uppercase">
+          <span>Made for living beautifully</span>
+          <span className="text-[#e3c587]">Complimentary delivery on orders over $500</span>
+        </div>
+      </div>
+      <div className="max-w-7xl mx-auto flex items-center justify-between px-4 py-2 md:py-1.5">
         <Link to="/" className="flex items-center gap-2">
-          <img src="/logo.jpg" alt="Lion's Furnitures Logo" className="h-20 md:h-24 w-auto object-contain mix-blend-multiply" />
+          <img src="/logo.jpg" alt="Lion's Furnitures Logo" className="h-16 md:h-20 w-auto object-contain mix-blend-multiply" />
         </Link>
 
         {/* Desktop navigation */}
@@ -44,19 +54,11 @@ export default function Header() {
           ))}
 
           {/* Icon links */}
-          <NavLink
-            to="/wishlist"
-            className={getNavLinkClass}
-            aria-label="Wishlist"
-          >
-            <Heart className="w-5 h-5" />
+          <NavLink to="/wishlist" className={getNavLinkClass} aria-label={`Wishlist, ${wishlistCount} items`}>
+            <span className="relative block"><Heart className="w-5 h-5" />{wishlistCount > 0 && <span className="absolute -right-2.5 -top-2.5 min-w-4 h-4 px-1 grid place-items-center rounded-full bg-[#b38947] text-[9px] text-white">{wishlistCount}</span>}</span>
           </NavLink>
-          <NavLink
-            to="/cart"
-            className={getNavLinkClass}
-            aria-label="Cart"
-          >
-            <ShoppingCart className="w-5 h-5" />
+          <NavLink to="/cart" className={getNavLinkClass} aria-label={`Cart, ${cartCount} items`}>
+            <span className="relative block"><ShoppingCart className="w-5 h-5" />{cartCount > 0 && <span className="absolute -right-2.5 -top-2.5 min-w-4 h-4 px-1 grid place-items-center rounded-full bg-[#b38947] text-[9px] text-white">{cartCount}</span>}</span>
           </NavLink>
           <NavLink
             to="/account"

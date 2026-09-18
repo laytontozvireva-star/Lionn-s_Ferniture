@@ -93,10 +93,8 @@ export default function About() {
       <section className="py-24 bg-[#101726] text-[#FAF7F2]">
         <div className="container mx-auto px-4 md:px-10 lg:px-16">
           <div className="text-center max-w-2xl mx-auto mb-16">
-            <h2 className="font-display text-3xl md:text-4xl mb-4">Our Philosophy</h2>
-            <p className="text-[#C9B49A] text-lg">
-              The principles that guide every cut, every sand, and every finish we apply.
-            </p>
+            <h2 className="font-display text-3xl md:text-4xl mb-4 text-[#FAF7F2]">Our Philosophy</h2>
+            <p className="text-[#FAF7F2] text-2xl md:text-3xl leading-relaxed mb-6 font-medium drop-shadow-md">The principles that guide every cut, every sand, and every finish we apply.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
             {values.map((val, idx) => {
