@@ -1,12 +1,9 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Search, SlidersHorizontal, X } from 'lucide-react';
 import ProductFilters from '../components/products/ProductFilters';
 import ProductGrid from '../components/products/ProductGrid';
-import { products } from '../data/products';
-import { categories } from '../data/categories';
-
-const MAX_PRICE = Math.ceil(Math.max(...products.map(p => p.price)) / 100) * 100; // round up to nearest 100
+import { useProducts } from '../context/ProductContext';
 
 const SORT_OPTIONS = [
   { value: 'default', label: 'Default' },
@@ -17,13 +14,24 @@ const SORT_OPTIONS = [
 ];
 
 export default function Shop() {
+  const { products, categories } = useProducts();
   const [searchParams, setSearchParams] = useSearchParams();
   const categoryParam = searchParams.get('category') || 'all';
 
+  const MAX_PRICE = useMemo(() => {
+    if (products.length === 0) return 2000;
+    return Math.ceil(Math.max(...products.map(p => p.price)) / 100) * 100;
+  }, [products]);
+
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('default');
-  const [priceRange, setPriceRange] = useState([0, MAX_PRICE]);
+  const [priceRange, setPriceRange] = useState([0, 2000]); // Will adjust in useEffect
   const [showMobileFilters, setShowMobileFilters] = useState(false);
+
+  // Update max price range when products load
+  React.useEffect(() => {
+    setPriceRange([0, MAX_PRICE]);
+  }, [MAX_PRICE]);
 
   // ── Filter + sort pipeline ──
   const filteredProducts = useMemo(() => {

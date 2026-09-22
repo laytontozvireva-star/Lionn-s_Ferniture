@@ -1,70 +1,117 @@
-# Getting Started with Create React App
+# Premium Furniture
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Premium Furniture is a React e-commerce storefront for browsing and ordering curated furniture. It includes product discovery, product details, wishlist and cart management, checkout flows, customer account pages, order history, contact forms, and custom furniture requests.
+
+## Features
+
+- Browse products by category with product filters and detail pages.
+- Add products to a persistent cart and wishlist.
+- Review cart totals and complete the checkout and payment flow.
+- View orders, order confirmation, and account pages.
+- Submit contact messages and custom furniture requests through Supabase.
+- Responsive interface built with Tailwind CSS and reusable React components.
+- Local sample product, category, and testimonial data for development.
+
+## Tech Stack
+
+- React 18
+- React Router 6
+- Create React App and `react-scripts`
+- Tailwind CSS and PostCSS
+- Supabase JavaScript client
+- Lucide React and React Icons
+
+## Getting Started
+
+### Requirements
+
+- Node.js 18 or newer
+- npm
+
+### Installation
+
+```bash
+npm install
+```
+
+Start the development server:
+
+```bash
+npm start
+```
+
+Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+## Environment Variables
+
+Supabase is optional for browsing the storefront. Add a `.env` file in the project root to enable contact and custom furniture submissions:
+
+```env
+REACT_APP_SUPABASE_URL=https://your-project.supabase.co
+REACT_APP_SUPABASE_ANON_KEY=your-anon-key
+```
+
+Do not expose a Supabase service-role key in the frontend. Only use the public anon key in `REACT_APP_SUPABASE_ANON_KEY`.
+
+### Supabase setup
+
+1. Create a Supabase project.
+2. Run [`supabase/schema.sql`](supabase/schema.sql) in the Supabase SQL Editor.
+3. Create the private Storage buckets `product-images` and `custom-request-images` if those workflows are enabled.
+4. Add the project URL and anon key to `.env`.
+
+The schema includes profiles, products, categories, product images, delivery zones, orders, order items, contact messages, and custom furniture requests, along with row-level security policies.
 
 ## Available Scripts
 
-In the project directory, you can run:
+| Command | Description |
+| --- | --- |
+| `npm start` | Start the development server. |
+| `npm run build` | Create an optimized production build in `build/`. |
+| `npm test` | Run the Create React App test runner. |
+| `npm run eject` | Eject from Create React App. This is irreversible. |
 
-### `npm start`
+## Application Routes
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+| Route | Purpose |
+| --- | --- |
+| `/` | Home page |
+| `/shop` | Product catalog |
+| `/shop/:id` | Product details |
+| `/custom-furniture` | Custom furniture request form |
+| `/about` | About the business |
+| `/contact` | Contact form |
+| `/wishlist` | Saved products |
+| `/cart` | Shopping cart |
+| `/checkout` | Checkout form |
+| `/payment` | Payment step |
+| `/order-confirmation` | Confirmation page |
+| `/orders` | Customer order history |
+| `/account` | Customer account |
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Project Structure
 
-### `npm test`
+```text
+src/
+  components/   Reusable UI grouped by feature
+  context/      Cart and wishlist state providers
+  data/         Local product, category, and testimonial data
+  lib/          Supabase client configuration
+  pages/        Route-level page components
+  services/     Backend-facing services
+  assets/       Local images and icons
+supabase/
+  schema.sql    Database schema and row-level security policies
+```
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Cart and wishlist items are persisted in `localStorage`, so they remain available after a browser refresh. Product and category content currently comes from the files in `src/data/`.
 
-### `npm run build`
+## Production Build
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Build the application with:
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+```bash
+npm run build
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Deploy the generated `build/` directory to a static hosting provider. Configure the same Supabase environment variables in the hosting provider's build environment when backend-backed forms are required. Because this is a client-side React Router app, configure the host to serve `index.html` for unknown routes.

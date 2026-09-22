@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Loader2 } from 'lucide-react';
+import { supabase, isSupabaseConfigured } from '../lib/supabase';
+import Toast from '../components/ui/Toast';
 
 export default function Checkout() {
   const navigate = useNavigate();
   const { cartItems, clearCart } = useCart();
+  const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [form, setForm] = useState({
     name: '',
@@ -20,11 +24,38 @@ export default function Checkout() {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handlePlaceOrder = (e) => {
+  const handlePlaceOrder = async (e) => {
     e.preventDefault();
-    // In a real app you'd send this data to a payment gateway.
-    clearCart();
-    navigate('/thank-you');
+    setIsSubmitting(true);
+
+    const payload = {
+      cartItems,
+      form,
+    };
+
+    try {
+      const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-checkout-session`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || 'Failed to create checkout session');
+      }
+
+      const { url } = await res.json();
+      // Redirect to Stripe Checkout
+      window.location.href = url;
+    } catch (err) {
+      console.error(err);
+      setToast({ show: true, message: err.message ?? 'Unable to start checkout', type: 'error' });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const subtotal = cartItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
@@ -32,7 +63,7 @@ export default function Checkout() {
   const total = subtotal + shipping;
 
   return (
-    <div className="pt-24 pb-20 bg-[#FBF9F5] min-h-screen">
+    <div className="pt-24 pb-20 bg-[#FBF9F5] min-h-screen relative">
       <div className="container mx-auto px-4 md:px-10 lg:px-16 max-w-3xl">
         <h1 className="font-display text-4xl text-[#101726] mb-8">Checkout</h1>
         {cartItems.length === 0 ? (
@@ -110,13 +141,23 @@ export default function Checkout() {
                 <span>Total</span>
                 <span>${total.toFixed(2)}</span>
               </div>
-              <button type="submit" className="w-full h-14 bg-[#101726] text-white rounded-xl font-medium hover:bg-[#0b101c] transition-colors flex items-center justify-center gap-2">
-                Place Order <ArrowRight className="w-5 h-5" />
+              <button 
+                type="submit" 
+                disabled={isSubmitting}
+                className="w-full h-14 bg-[#101726] text-white rounded-xl font-medium hover:bg-[#0b101c] transition-colors flex items-center justify-center gap-2 disabled:opacity-70"
+              >
+                {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <>Place Order <ArrowRight className="w-5 h-5" /></>}
               </button>
             </div>
           </form>
         )}
       </div>
+      <Toast 
+        message={toast.message} 
+        isVisible={toast.show} 
+        onClose={() => setToast(prev => ({ ...prev, show: false }))} 
+        type={toast.type}
+      />
     </div>
   );
 }

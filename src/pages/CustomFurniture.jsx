@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { ArrowRight, FileText, Hammer, Truck, CheckCircle2, Upload } from 'lucide-react';
+import { ArrowRight, FileText, Hammer, Truck, CheckCircle2, Loader2 } from 'lucide-react';
+import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import Toast from '../components/ui/Toast';
 
 const heroImg = 'https://images.unsplash.com/photo-1540574163026-643ea20ade25?q=80&w=1600&auto=format&fit=crop';
@@ -19,17 +20,46 @@ export default function CustomFurniture() {
     budget: '',
     details: ''
   });
-  const [toast, setToast] = useState({ show: false, message: '' });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setToast({ show: true, message: 'Your custom request has been sent! Our team will reach out shortly.' });
-    setForm({ name: '', email: '', phone: '', material: '', budget: '', details: '' });
+    
+    if (!isSupabaseConfigured) {
+      setToast({ show: true, message: 'Database not connected. Simulation only.', type: 'info' });
+      setForm({ name: '', email: '', phone: '', material: '', budget: '', details: '' });
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const { error } = await supabase.from('custom_furniture_requests').insert({
+        name: form.name,
+        email: form.email,
+        phone: form.phone || null,
+        furniture_type: 'custom',
+        material: form.material || null,
+        budget: form.budget || null,
+        details: form.details
+      });
+
+      if (error) throw error;
+
+      setToast({ show: true, message: 'Your custom request has been sent! Our team will reach out shortly.', type: 'success' });
+      setForm({ name: '', email: '', phone: '', material: '', budget: '', details: '' });
+    } catch (err) {
+      console.error('Error submitting custom request:', err);
+      setToast({ show: true, message: 'Failed to send request. Please try again.', type: 'error' });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -142,8 +172,16 @@ export default function CustomFurniture() {
                 </div>
 
                 <div className="pt-2">
-                  <button type="submit" className="w-full flex items-center justify-center gap-2 bg-[#101726] text-white px-6 py-4 rounded-xl font-semibold hover:bg-[#b38947] hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5">
-                    Submit Request <ArrowRight className="w-4 h-4" />
+                  <button 
+                    type="submit" 
+                    disabled={isSubmitting}
+                    className="w-full flex items-center justify-center gap-2 bg-[#101726] text-white px-6 py-4 rounded-xl font-semibold hover:bg-[#b38947] hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5 disabled:opacity-70"
+                  >
+                    {isSubmitting ? (
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                    ) : (
+                      <>Submit Request <ArrowRight className="w-4 h-4" /></>
+                    )}
                   </button>
                 </div>
               </form>
