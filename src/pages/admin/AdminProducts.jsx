@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useProducts } from '../../context/ProductContext';
-import { Plus, Search, Pencil, Trash2, X, Package } from 'lucide-react';
+import { Plus, Search, Pencil, Trash2, X, Package, Loader2 } from 'lucide-react';
 console.log(Package); // Temporary check
 export default function AdminProducts() {
   const { products, categories, deleteProduct } = useProducts();
   const [search, setSearch] = useState('');
   const [filterCategory, setFilterCategory] = useState('all');
   const [deleteConfirm, setDeleteConfirm] = useState(null);
+  const [deletingId, setDeletingId] = useState(null);
 
   const filtered = products.filter(p => {
     const matchesSearch = p.name.toLowerCase().includes(search.toLowerCase());
@@ -144,10 +145,15 @@ export default function AdminProducts() {
                       {deleteConfirm === product.id ? (
                         <div className="flex items-center gap-1">
                           <button
-                            onClick={() => handleDelete(product.id)}
+                            onClick={async () => {
+                              setDeletingId(product.id);
+                              await deleteProduct(product.id);
+                              setDeletingId(null);
+                              setDeleteConfirm(null);
+                            }}
                             className="px-3 py-1.5 rounded-lg text-sm font-medium text-white bg-red-500 hover:bg-red-600 transition-colors"
                           >
-                            Confirm
+                            {deletingId === product.id ? <Loader2 className="animate-spin w-4 h-4" /> : 'Confirm'}
                           </button>
                           <button
                             onClick={() => setDeleteConfirm(null)}

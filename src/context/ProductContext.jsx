@@ -184,15 +184,22 @@ export function ProductProvider({ children }) {
   }, [categories]);
 
   const deleteProduct = useCallback(async (id) => {
+    // Optimistically update UI
+    const previousProducts = products;
+    setProducts(prev => prev.filter(p => p.id !== id));
     if (isSupabaseConfigured) {
       try {
+        // Delete related images first
+        await supabase.from('product_images').delete().eq('product_id', id);
+        // Then delete the product
         await supabase.from('products').delete().eq('id', id);
       } catch (err) {
         console.error('Failed to delete product in Supabase:', err);
+        // Revert UI if deletion fails
+        setProducts(previousProducts);
       }
     }
-    setProducts(prev => prev.filter(p => p.id !== id));
-  }, []);
+  }, [products]);
 
   // ── Category CRUD ──
   const addCategory = useCallback(async (category) => {
