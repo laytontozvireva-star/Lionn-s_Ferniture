@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useProducts } from '../../context/ProductContext';
-import { ArrowLeft, Save, ImageIcon } from 'lucide-react';
+import { supabase } from '../../lib/supabase'; import { ArrowLeft, Save, ImageIcon } from 'lucide-react'; import Toast from '../../components/ui/Toast';
 
 export default function AdminProductForm() {
   const { id } = useParams();
@@ -15,12 +15,13 @@ export default function AdminProductForm() {
     originalPrice: '',
     categorySlug: categories[0]?.slug || '',
     categoryId: categories[0]?.id || '',
-    image: '',
+    image: '', // existing image URL (for edits)
     description: '',
     rating: '4.5',
     reviews: '0',
     isNew: false,
     isOnSale: false,
+    file: null, // holds selected file for upload
   });
 
   const [errors, setErrors] = useState({});
@@ -76,7 +77,8 @@ export default function AdminProductForm() {
     if (!form.name.trim()) newErrors.name = 'Product name is required';
     if (!form.price || parseFloat(form.price) <= 0) newErrors.price = 'Valid price is required';
     if (!form.categorySlug) newErrors.categorySlug = 'Category is required';
-    if (!form.image.trim()) newErrors.image = 'Image URL is required';
+    // Require an image file for new product; allow existing image on edit
+    if (!isEditing && !form.file) newErrors.file = 'Product image file is required';
     if (!form.description.trim()) newErrors.description = 'Description is required';
     if (form.isOnSale && (!form.originalPrice || parseFloat(form.originalPrice) <= parseFloat(form.price))) {
       newErrors.originalPrice = 'Original price must be higher than sale price';
