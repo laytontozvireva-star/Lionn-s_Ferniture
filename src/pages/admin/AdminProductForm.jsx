@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useProducts } from '../../context/ProductContext';
-import { supabase } from '../../lib/supabase'; import { ArrowLeft, Save, ImageIcon } from 'lucide-react'; import Toast from '../../components/ui/Toast';
+import { supabase, isSupabaseConfigured } from '../../lib/supabase';
+import { ArrowLeft, Save, ImageIcon, Upload, Loader2 } from 'lucide-react';
+import Toast from '../../components/ui/Toast';
 
 export default function AdminProductForm() {
   const { id } = useParams();
@@ -25,6 +27,10 @@ export default function AdminProductForm() {
   });
 
   const [errors, setErrors] = useState({});
+  const [uploading, setUploading] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState(null);
+  // Toast notification state
+  const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
 
   // Load product data for editing
   useEffect(() => {
@@ -72,6 +78,48 @@ export default function AdminProductForm() {
     }));
   };
 
+  const handleFileSelect = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      setErrors(prev => ({ ...prev, file: 'Please select an image file' }));
+      return;
+    }
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      setErrors(prev => ({ ...prev, file: 'Image must be less than 5MB' }));
+      return;
+    }
+    setForm(prev => ({ ...prev, file }));
+    setPreviewUrl(URL.createObjectURL(file));
+    setErrors(prev => ({ ...prev, file: '' }));
+  };
+
+  // Upload to Supabase Storage
+  const uploadImage = async (file) => {
+    if (!isSupabaseConfigured || !file) return null;
+
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+    const filePath = `products/${fileName}`;
+
+    const mime = file.type || 'application/octet-stream';
+
+    // Must use upsert: false because we only set an INSERT policy, not an UPDATE policy!
+    const { error } = await supabase.storage
+      .from('product-images')
+      .upload(filePath, file, { contentType: mime, upsert: false });
+
+    if (error) {
+      console.error('🛑 Supabase upload error:', error);
+      throw error;
+    }
+
+    const { data } = supabase.storage.from('product-images').getPublicUrl(filePath);
+    return data?.publicUrl ?? '';
+  };
+
   const validate = () => {
     const newErrors = {};
     if (!form.name.trim()) newErrors.name = 'Product name is required';
@@ -87,30 +135,49 @@ export default function AdminProductForm() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validate()) return;
 
-    const productData = {
-      name: form.name.trim(),
-      price: parseFloat(form.price),
-      originalPrice: form.isOnSale ? parseFloat(form.originalPrice) : undefined,
-      categorySlug: form.categorySlug,
-      categoryId: form.categoryId,
-      image: form.image.trim(),
-      description: form.description.trim(),
-      rating: parseFloat(form.rating),
-      reviews: parseInt(form.reviews, 10),
-      isNew: form.isNew,
-      isOnSale: form.isOnSale,
-    };
+    setUploading(true);
+    try {
+      // Upload image to Supabase if one was selected
+      let imageUrl = form.image;
+      if (form.file) {
+        const uploadedUrl = await uploadImage(form.file);
+        if (uploadedUrl) imageUrl = uploadedUrl;
+      }
 
-    if (isEditing) {
-      updateProduct(id, productData);
-    } else {
-      addProduct(productData);
+      const productData = {
+        name: form.name.trim(),
+        price: parseFloat(form.price),
+        originalPrice: form.isOnSale ? parseFloat(form.originalPrice) : undefined,
+        categorySlug: form.categorySlug,
+        categoryId: form.categoryId,
+        image: imageUrl,
+        description: form.description.trim(),
+        rating: parseFloat(form.rating),
+        reviews: parseInt(form.reviews, 10),
+        isNew: form.isNew,
+        isOnSale: form.isOnSale,
+      };
+
+      // After successful add/update, show toast
+      if (isEditing) {
+        updateProduct(id, productData);
+        setToast({ show: true, message: 'Product updated successfully', type: 'success' });
+      } else {
+        addProduct(productData);
+        setToast({ show: true, message: 'Product created successfully', type: 'success' });
+      }
+      navigate('/admin/products');
+    } catch (err) {
+      console.error('Failed to upload image:', err);
+      setErrors(prev => ({ ...prev, file: 'Failed to upload image. Please try again.' }));
+      setToast({ show: true, message: 'Failed to upload image. Please try again.', type: 'info' });
+    } finally {
+      setUploading(false);
     }
-    navigate('/admin/products');
   };
 
   return (
@@ -244,29 +311,54 @@ export default function AdminProductForm() {
         <div className="bg-white rounded-xl border border-gray-200 p-6">
           <h3 className="font-semibold text-[#101726] mb-4">Product Image</h3>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Image URL *</label>
-            <input
-              name="image"
-              value={form.image}
-              onChange={handleChange}
-              placeholder="https://images.unsplash.com/..."
-              className={`w-full px-4 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-[#b38947] focus:border-transparent ${errors.image ? 'border-red-300' : 'border-gray-300'}`}
-            />
-            {errors.image && <p className="text-red-500 text-xs mt-1">{errors.image}</p>}
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              Upload Image {!isEditing && '*'}
+            </label>
+            <label
+              className={`flex flex-col items-center justify-center w-full h-40 border-2 border-dashed rounded-xl cursor-pointer transition-colors hover:border-[#b38947] hover:bg-[#faf6ee] ${errors.file ? 'border-red-300 bg-red-50' : 'border-gray-300 bg-gray-50'}`}
+            >
+              <div className="flex flex-col items-center justify-center py-4">
+                <Upload className="w-8 h-8 text-gray-400 mb-2" />
+                <p className="text-sm text-gray-500">
+                  <span className="font-semibold text-[#b38947]">Click to upload</span> or drag and drop
+                </p>
+                <p className="text-xs text-gray-400 mt-1">PNG, JPG, WEBP (max 5MB)</p>
+              </div>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleFileSelect}
+                className="hidden"
+              />
+            </label>
+            {errors.file && <p className="text-red-500 text-xs mt-1">{errors.file}</p>}
           </div>
           {/* Preview */}
-          {form.image && (
+          {(previewUrl || form.image) && (
             <div className="mt-4">
               <p className="text-xs text-gray-500 mb-2">Preview:</p>
-              <img
-                src={form.image}
-                alt="Preview"
-                className="w-32 h-32 object-cover rounded-lg border border-gray-200 bg-gray-100"
-                onError={(e) => { e.target.style.display = 'none'; }}
-              />
+              <div className="relative inline-block">
+                <img
+                  src={previewUrl || form.image}
+                  alt="Preview"
+                  className="w-32 h-32 object-cover rounded-lg border border-gray-200 bg-gray-100"
+                />
+                {previewUrl && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPreviewUrl(null);
+                      setForm(prev => ({ ...prev, file: null }));
+                    }}
+                    className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600"
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
             </div>
           )}
-          {!form.image && (
+          {!previewUrl && !form.image && (
             <div className="mt-4 w-32 h-32 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center">
               <ImageIcon className="w-8 h-8 text-gray-300" />
             </div>
@@ -308,10 +400,14 @@ export default function AdminProductForm() {
         <div className="flex items-center gap-3">
           <button
             type="submit"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-[#b38947] text-white rounded-lg font-semibold hover:bg-[#916a2e] transition-colors"
+            disabled={uploading}
+            className="inline-flex items-center gap-2 px-6 py-3 bg-[#b38947] text-white rounded-lg font-semibold hover:bg-[#916a2e] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            <Save className="w-4 h-4" />
-            {isEditing ? 'Update Product' : 'Create Product'}
+            {uploading ? (
+              <><Loader2 className="w-4 h-4 animate-spin" /> Uploading...</>
+            ) : (
+              <><Save className="w-4 h-4" /> {isEditing ? 'Update Product' : 'Create Product'}</>
+            )}
           </button>
           <button
             type="button"
@@ -322,6 +418,15 @@ export default function AdminProductForm() {
           </button>
         </div>
       </form>
+      {/* Toast notification */}
+      {toast.show && (
+        <Toast
+          message={toast.message}
+          isVisible={toast.show}
+          onClose={() => setToast({ ...toast, show: false })}
+          type={toast.type}
+        />
+      )}
     </div>
   );
 }

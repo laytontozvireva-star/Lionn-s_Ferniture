@@ -9,8 +9,24 @@ const PRODUCTS_KEY = 'lionn_products';
 const CATEGORIES_KEY = 'lionn_categories';
 
 export function ProductProvider({ children }) {
-  const [products, setProducts] = useState([]);
-  const [categories, setCategories] = useState([]);
+  const [products, setProducts] = useState(() => {
+    try {
+      const stored = localStorage.getItem(PRODUCTS_KEY);
+      return stored ? JSON.parse(stored) : seedProducts;
+    } catch {
+      return seedProducts;
+    }
+  });
+  
+  const [categories, setCategories] = useState(() => {
+    try {
+      const stored = localStorage.getItem(CATEGORIES_KEY);
+      return stored ? JSON.parse(stored) : seedCategories;
+    } catch {
+      return seedCategories;
+    }
+  });
+  
   const [isLoading, setIsLoading] = useState(true);
 
   // Load initial data

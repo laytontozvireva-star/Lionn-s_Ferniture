@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useProducts } from '../../context/ProductContext';
 import { Plus, Search, Pencil, Trash2, X, Package, Loader2 } from 'lucide-react';
-console.log(Package); // Temporary check
+
 export default function AdminProducts() {
   const { products, categories, deleteProduct } = useProducts();
   const [search, setSearch] = useState('');
